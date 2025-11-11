@@ -1,0 +1,608 @@
+/* =========================================
+   Villa Nika – style.css
+   Mobile-first, flat & minimal design
+   ========================================= */
+
+/* ---------- Root Palette ---------- */
+:root {
+  --background: #f6f9fc;     /* very light blue background */
+  --text: #1a1a1a;
+  --accent: #9ac3f5;        /* baby blue main accent */
+  --accent-light: #c9e2ff;  /* light baby blue */
+  --accent-dark: #6aa9e9;   /* deeper blue for hover */
+  --border: #dbe6f0;
+  --white: #ffffff;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+/* dodatni razmak za sekcijske naslove */
+h2 {
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+p, li { margin-bottom: 0.75rem; }
+a {
+  color: var(--accent-dark);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover { color: var(--accent); }
+
+/* ---------- Containers ---------- */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+/* ---------- Header ---------- */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 12px; /* top, bottom spacing */
+  flex-wrap: wrap;
+  gap: 12px; /* adds subtle space between logo/brand and navigation */
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand img {
+  height: 32px;
+  width: auto;
+}
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+   margin-top: 2px;
+
+}
+/* ---------- Tabs Navigation ---------- */
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  position: relative; /* omogućuje pseudo-elemente ::before/::after */
+
+  padding-bottom: 14px;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+/* Desni fade koji sugerira da ima još tabova udesno */
+.tabs::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 44px;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(to left, var(--background) 60%, transparent);
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+/* Na desktopu ne treba hint */
+@media (min-width: 801px) {
+  .tabs::after { display: none; }
+}
+/* Početni scroll hint: "Swipe →" koji nestane, postavljen ispod tabova */
+.tabs::before {
+  content: "Swipe →";
+  position: absolute;
+  right: 12px;
+  bottom: 6px;        /* bilo: top: 50% */
+  transform: none;    /* više ne centriramo po Y osi */
+  font-size: 12px;
+  padding: 4px 8px;
+  background: rgba(0,0,0,0.08);
+  color: #333;
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: 1;
+  animation: nudgeOut 1.6s ease-out 1 forwards; /* brže nestajanje */
+}
+
+@keyframes nudgeOut {
+  0%   { transform: translateY(-50%) translateX(0);   opacity: 1; }
+  20%  { transform: translateY(-50%) translateX(8px); opacity: 1; }
+  40%  { transform: translateY(-50%) translateX(0);   opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Kad korisnik malo skrola, klasa .is-scrolled preusmjerava ::before u lijevi fade */
+.tabs.is-scrolled::before {
+  content: "";
+  left: 0;
+  right: auto;
+  top: 0;
+  transform: none;
+  width: 44px;
+  height: 100%;
+  background: linear-gradient(to right, var(--background) 60%, transparent);
+  border-radius: 0;
+  padding: 0;
+  animation: none;
+  opacity: 1;
+}
+
+/* Kad smo do kraja desno, ugasi desni fade */
+.tabs.is-end::after {
+  opacity: 0;
+}
+
+.tab-btn {
+  flex: 0 0 auto; /* Prevent wrapping */
+  appearance: none;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  scroll-snap-align: start;
+}
+.tab-btn span {
+  white-space: nowrap;
+}
+.tab-btn:hover { border-color: var(--accent-light); color: var(--accent-dark); }
+.tab-btn[aria-selected="true"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+/* ---------- Hero Section ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+    min-height: clamp(360px, 45vh, 560px);
+  border: 1px solid var(--border);
+  margin: 16px 0 24px;
+}
+/* Hero panorama effect – full width while content stays centered */
+.hero {
+  width: 100vw; /* full screen width */
+  margin-left: calc(-50vw + 50%); /* centers it */
+  border-left: none;
+  border-right: none;
+}
+.hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center; /* centriraj sliku unutar okvira */
+
+}
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.45) 100%);
+  color: #fff;
+  padding: 24px;
+}
+.hero-title {
+  font-size: clamp(26px, 5vw, 42px);
+  line-height: 1.1;
+}
+.hero-sub { opacity: 0.9; max-width: 700px; }
+/* ---------- Content Padding (below Hero) ---------- */
+main {
+  padding: 60px 60px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 800px) {
+  main {
+    padding: 24px 20px;
+  }
+}
+
+
+/* ---------- Main & Tabs ---------- */
+.tab-panel {
+  display: none;
+  animation: fade 0.3s ease;
+}
+.tab-panel.active { display: block; }
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Cards & Grids ---------- */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+/* ---------- Arrival Info Spacing ---------- */
+.card h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card ul {
+  margin-bottom: 20px;
+}
+
+.map-embed {
+  margin: 16px 0 24px;
+  border: 1px solid var(--border);
+  height: 250px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.arrival-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--accent-light);
+  color: #333;
+  padding: 12px;
+  font-size: 14px;
+  margin-top: 24px;
+  border: 1px solid var(--accent);
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 800px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Icon Rows ---------- */
+.icon-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+.item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  padding: 10px;
+  background: var(--white);
+}
+.icon {
+  width: 36px;
+  height: 36px;
+  background: var(--accent-light);
+  display: grid;
+  place-items: center;
+}
+.icon svg { width: 18px; height: 18px; color: var(--accent-dark); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+.btn:hover { background: var(--accent-dark); }
+
+/* ---------- Arrival Photos ---------- */
+.arrival-photos {
+  margin: 16px 0;
+}
+.photo-card {
+  border: 1px solid var(--border);
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.photo-card img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+.photo-card .caption {
+  padding: 6px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* ---------- Accordion ---------- */
+.accordion { display: grid; gap: 8px; }
+.acc-item { border: 1px solid var(--border); background: var(--white); }
+.acc-head {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  background: var(--white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.acc-head:hover { background: var(--accent-light); }
+.acc-content {
+  display: none;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #333;
+}
+.acc-item.open .acc-content { display: block; }
+
+/* ---------- Form ---------- */
+form {
+  display: grid;
+  gap: 12px;
+}
+label span {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+input, select, textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  padding: 10px;
+  font: inherit;
+  background: var(--white);
+}
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ---------- Lists ---------- */
+ul { list-style: disc; margin-left: 20px; }
+
+/* ---------- Footer ---------- */
+.footer {
+  margin-top: 40px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: #444;
+  text-align: center;
+}
+/* ---------- Local Tips Cards ---------- */
+.tips-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+@media (min-width: 800px) {
+  .tips-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.tip-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  /* no border-radius = sharp look */
+}
+
+.tip-card i {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  color: var(--accent-dark);
+}
+
+.tip-content h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-family: 'Playfair Display', serif;
+}
+
+.tip-content p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.tip-content ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.tip-content li a {
+  display: block;
+  padding: 4px 0;
+  font-weight: 500;
+  color: var(--accent-dark);
+}
+
+.tip-content li a:hover {
+  color: var(--accent);
+}
+/* ---------- Villa Guide Enhancements ---------- */
+.guide-hero {
+  width: 100%;
+  height: auto;
+  margin: 12px 0 16px;
+  border: 1px solid var(--border);
+}
+
+.quick-tips {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr;
+  margin-bottom: 20px;
+}
+@media (min-width: 600px) {
+  .quick-tips { grid-template-columns: repeat(3, 1fr); }
+}
+.quick-tips .tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 14px;
+}
+.quick-tips i {
+  color: var(--accent-dark);
+  width: 18px;
+  height: 18px;
+}
+
+.guide-photo {
+  width: 100%;
+  max-width: 240px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.guide-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-light);
+  color: var(--text);
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.guide-link:hover {
+  background: var(--accent);
+  color: #fff;
+}
+/* ---------- Arrival Info Enhancements ---------- */
+.map-embed {
+  border: 1px solid var(--border);
+  margin: 10px 0 20px;
+  width: 100%;
+  height: 240px;
+}
+.map-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.arrival-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--accent-light);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  margin-top: 20px;
+  color: var(--text);
+}
+.arrival-tip i {
+  width: 20px;
+  height: 20px;
+  color: var(--accent-dark);
+  flex-shrink: 0;
+}
+.arrival-tip p {
+  margin: 0;
+  font-size: 14px;
+}
+
+#tab-arrival h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#tab-arrival h3 i {
+  width: 18px;
+  height: 18px;
+  color: var(--accent-dark);
+}
+.lang-switch {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.lang-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+.lang-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+.lang-btn:hover {
+  background: var(--accent-light);
+}
+/* Sjena headera na scroll */
+.header.shadow {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: rgba(245, 243, 239, 0.95);
+  backdrop-filter: saturate(1.2) blur(6px);
+}
+
+
